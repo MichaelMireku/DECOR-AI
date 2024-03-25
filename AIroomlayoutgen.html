@@ -11,6 +11,12 @@
         <h1>Decor🏡: AI Room Layout Generator</h1>
     </header>
     <main>
+        <section id="camera-section">
+            <h2>Take a photo of your room:</h2>
+            <video id="camera-stream" autoplay></video>
+            <button id="capture-photo-btn">Capture Photo</button>
+            <canvas id="capture-canvas" style="display:none;"></canvas>
+        </section>
         <section id="style-section">
             <h2>Tell us about your style:</h2>
             <textarea id="style-input" placeholder="Describe your style preferences"></textarea>
@@ -27,7 +33,36 @@
         <section id="layout-results">
             <!-- Layout suggestions will be displayed here -->
         </section>
+     
     </main>
     <script src="js/script.js"></script>
+  
+    <script>
+        // Get access to the camera stream
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                const videoElement = document.getElementById('camera-stream');
+                videoElement.srcObject = stream;
+            })
+            .catch(function(error) {
+                console.error('Error accessing camera:', error);
+            });
+
+        // Capture a photo when the button is clicked
+        const captureButton = document.getElementById('capture-photo-btn');
+        captureButton.addEventListener('click', function() {
+            const videoElement = document.getElementById('camera-stream');
+            const canvasElement = document.getElementById('capture-canvas');
+            const context = canvasElement.getContext('2d');
+
+            // Draw the current video frame onto the canvas
+            context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+            // You can now process or display the captured photo data from the canvas
+            // For example, you can convert the canvas data to a data URL and display it as an image
+            const photoDataURL = canvasElement.toDataURL('image/jpeg');
+            // ... do something with the captured photo data
+        });
+    </script>
 </body>
 </html>
