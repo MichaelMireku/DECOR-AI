@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Camera Access</title>
+  <style>
+    #camera-stream {
+      width: 640px;
+      height: 480px;
+      border: 1px solid black;
+    }
+    #captured-photos {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    #captured-photos img {
+      max-width: 200px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Camera Access</h1>
+  <video id="camera-stream" autoplay></video>
+  <br>
+  <button id="capture-button">Capture Photo</button>
+  <button id="switch-camera-button">Switch Camera</button>
+  <div id="captured-photos"></div>
+
+  <script>
+    let stream;
+    const videoElement = document.getElementById('camera-stream');
+    const captureButton = document.getElementById('capture-button');
+    const switchCameraButton = document.getElementById('switch-camera-button');
+    const capturedPhotosContainer = document.getElementById('captured-photos');
+
+    // Get access to the camera stream
+    async function getStream() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+      }
+    }
+
+    // Capture a photo
+    captureButton.addEventListener('click', function() {
+      const canvasElement = document.createElement('canvas');
+      canvasElement.width = videoElement.width;
+      canvasElement.height = videoElement.height;
+      const context = canvasElement.getContext('2d');
+      context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+      const photoDataURL = canvasElement.toDataURL('image/jpeg');
+      const photoImage = document.createElement('img');
+      photoImage.src = photoDataURL;
+      capturedPhotosContainer.appendChild(photoImage);
+    });
+
+    // Switch camera
+    switchCameraButton.addEventListener('click', async function() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      await getStream();
+    });
+
+    // Initialize
+    getStream();
+  </script>
+</body>
+</html>
